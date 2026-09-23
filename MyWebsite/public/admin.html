@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin ERP & Business Management | NIDHISH CLOTH STORE</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/css/royal-theme.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            maroon: '#7b001c',
+            'maroon-dark': '#520013',
+            gold: '#d4af37',
+            cream: '#fdfbf7',
+            charcoal: '#1a1a1a',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased font-sans">
+
+  <!-- ================= ADMIN LOGIN MODAL ================= -->
+  <div id="adminLoginModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border-2 border-amber-400 max-w-md w-full p-8 text-center relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-100 rounded-full opacity-50"></div>
+      
+      <div class="w-16 h-16 bg-[#7b001c] text-[#f3e5ab] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg border border-amber-300">
+        👑
+      </div>
+      
+      <span class="text-xs uppercase tracking-widest font-bold text-amber-700">Protected Store ERP</span>
+      <h2 class="font-royal text-2xl font-bold text-[#7b001c] mb-1">NIDHISH CLOTH STORE</h2>
+      <p class="text-xs text-gray-500 mb-6">Staff & Administrator Access Gateway</p>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-left text-xs">
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Admin Email Address / Login ID</label>
+          <input type="email" id="adminEmailInput" required value="goswamiashokpuri65@gmail.com" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-[#7b001c]">
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-semibold text-gray-700">Password</label>
+            <button type="button" onclick="openForgotPasswordModal()" class="text-[#7b001c] hover:underline font-bold text-[11px] flex items-center gap-1">
+              <span>🔑</span> Forgot Password? (पासवर्ड भूल गए?)
+            </button>
+          </div>
+          <input type="password" id="adminPasswordInput" required value="Ashokpuri65@9691" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-[#7b001c]">
+        </div>
+
+        <div class="bg-amber-50 p-2.5 rounded border border-amber-200 text-[11px] text-amber-900 flex justify-between items-center">
+          <span>Admin Account:</span>
+          <b>goswamiashokpuri65@gmail.com</b>
+        </div>
+
+        <button type="submit" class="w-full btn-royal-gold py-3 rounded-lg font-bold text-xs uppercase tracking-wider shadow-md">
+          Authenticate & Enter ERP
+        </button>
+
+        <div class="text-center pt-2">
+          <a href="/" class="text-gray-500 hover:text-[#7b001c] underline text-[11px]">← Return to Customer Storefront</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= FORGOT PASSWORD MODAL (OTP VERIFICATION) ================= -->
+  <div id="forgotPasswordModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border-2 border-amber-400 max-w-md w-full p-6 text-center relative overflow-hidden">
+      <!-- Close Button -->
+      <button type="button" onclick="closeForgotPasswordModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg">✕</button>
+
+      <div class="w-12 h-12 bg-amber-100 text-[#7b001c] rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 shadow">
+        🔑
+      </div>
+
+      <h3 class="font-royal text-xl font-bold text-[#7b001c] mb-1">पासवर्ड रीसेट (OTP Verification)</h3>
+      <p class="text-xs text-gray-500 mb-4">रजिस्टर्ड ईमेल या मोबाइल नंबर पर 6-डिजिट OTP प्राप्त करें</p>
+
+      <!-- Step 1: Request OTP Form -->
+      <form id="requestOtpForm" onsubmit="handleSendOtp(event)" class="space-y-3 text-left text-xs">
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Registered Email or Mobile Number *</label>
+          <input type="text" id="forgotIdentifierInput" required placeholder="e.g. goswamiashokpuri65@gmail.com या 9672806509" value="goswamiashokpuri65@gmail.com" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-[#7b001c]">
+        </div>
+        <button type="submit" id="btnSendOtp" class="w-full btn-royal-gold py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider shadow">
+          📲 Get 6-Digit OTP (ओटीपी भेजें)
+        </button>
+      </form>
+
+      <!-- Step 2: Verify OTP & New Password Form -->
+      <form id="verifyOtpForm" onsubmit="handleResetPasswordWithOtp(event)" class="hidden space-y-3 text-left text-xs mt-3 border-t border-gray-100 pt-3">
+        <div id="otpSentAlert" class="bg-emerald-50 text-emerald-800 p-2.5 rounded border border-emerald-200 text-xs"></div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Enter 6-Digit OTP *</label>
+          <input type="text" id="resetOtpInput" required maxlength="6" placeholder="123456" class="w-full border border-amber-300 rounded-lg p-2.5 font-mono text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-[#7b001c]">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">New Password (नया पासवर्ड) *</label>
+          <input type="password" id="resetNewPasswordInput" required minlength="6" placeholder="कम से कम 6 अक्षर" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-[#7b001c]">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Confirm New Password (पासवर्ड दोबारा लिखें) *</label>
+          <input type="password" id="resetConfirmPasswordInput" required minlength="6" placeholder="वही पासवर्ड दोबारा लिखें" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-[#7b001c]">
+        </div>
+
+        <button type="submit" id="btnResetPassword" class="w-full btn-royal-maroon py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider shadow">
+          ✅ Reset Password & Login (पासवर्ड बदलें)
+        </button>
+
+        <div class="text-center pt-1">
+          <button type="button" onclick="resendOtp()" class="text-xs text-amber-800 underline hover:text-[#7b001c]">Resend OTP</button>
+        </div>
+      </form>
+
+      <div class="text-center mt-4">
+        <button type="button" onclick="closeForgotPasswordModal()" class="text-gray-500 hover:text-gray-800 text-xs underline">
+          ← Back to Admin Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN ADMIN APP CONTAINER ================= -->
+  <div id="adminAppContainer" class="hidden flex h-screen overflow-hidden">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-64 bg-[#1a1a1a] text-gray-300 flex flex-col justify-between border-r border-amber-600/30 flex-shrink-0">
+      
+      <!-- Brand & Profile -->
+      <div>
+        <div class="p-4 border-b border-gray-800 bg-[#121212] flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#7b001c] to-[#9c0024] flex items-center justify-center text-amber-300 text-lg border border-amber-400">
+            👑
+          </div>
+          <div>
+            <div class="font-royal text-sm font-bold text-[#f3e5ab] tracking-wider leading-tight">NIDHISH STORE</div>
+            <div class="text-[10px] text-amber-500 uppercase tracking-widest font-semibold">Store ERP & POS</div>
+          </div>
+        </div>
+
+        <!-- Admin user tag -->
+        <div class="px-4 py-2 bg-amber-950/40 border-b border-gray-800/80 flex items-center justify-between text-xs">
+          <span class="text-gray-400">User: <b id="adminNameDisplay" class="text-amber-200">Ashok Puri</b></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500" title="Online"></span>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="p-2 space-y-1 overflow-y-auto max-h-[calc(100vh-210px)] text-xs">
+          <button onclick="switchTab('dashboard')" data-tab="dashboard" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>📊</span> <span>Dashboard & KPIs</span>
+          </button>
+          
+          <button onclick="switchTab('pos')" data-tab="pos" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors text-amber-300">
+            <span>⚡</span> <span class="font-bold">POS Counter Billing</span>
+          </button>
+
+          <button onclick="switchTab('products')" data-tab="products" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>👗</span> <span>Product Catalog</span>
+          </button>
+
+          <button onclick="switchTab('purchases')" data-tab="purchases" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>📥</span> <span>Supplier Purchases</span>
+          </button>
+
+          <button onclick="switchTab('inventory')" data-tab="inventory" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>📦</span> <span>Stock & Inventory Audit</span>
+          </button>
+
+          <button onclick="switchTab('customers')" data-tab="customers" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>👥</span> <span>Customer CRM & Ledger</span>
+          </button>
+
+          <button onclick="switchTab('suppliers')" data-tab="suppliers" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>🏭</span> <span>Supplier Directory & Dues</span>
+          </button>
+
+          <button onclick="switchTab('payments')" data-tab="payments" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>💳</span> <span>Payments & Receipts</span>
+          </button>
+
+          <button onclick="switchTab('reports')" data-tab="reports" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>📑</span> <span>Reports & Profit/Loss</span>
+          </button>
+
+          <button onclick="switchTab('settings')" data-tab="settings" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors">
+            <span>⚙️</span> <span>Store & GST Settings</span>
+          </button>
+
+          <button onclick="switchTab('profile')" data-tab="profile" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors text-amber-200 hover:text-white">
+            <span>👤</span> <span class="font-semibold">Admin Profile (प्रोफ़ाइल)</span>
+          </button>
+
+          <button type="button" onclick="openStoreQrModal()" class="admin-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors text-amber-300 hover:text-white font-bold bg-amber-950/30 border border-amber-600/30">
+            <span>📱</span> <span>Store QR & Standee (दुकान का QR)</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Actions -->
+      <div class="p-3 border-t border-gray-800 space-y-1.5 text-xs">
+        <a href="/" target="_blank" class="block w-full text-center py-2 px-3 rounded bg-gray-800 hover:bg-gray-700 text-amber-200 font-semibold transition-colors">
+          🛍️ Visit Customer Website ↗
+        </a>
+        <button onclick="handleAdminLogout()" class="block w-full text-center py-2 px-3 rounded bg-red-950/40 hover:bg-red-900/60 text-red-300 font-semibold transition-colors">
+          Logout Session
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col overflow-y-auto bg-slate-50">
+      
+      <!-- Top Bar -->
+      <header class="bg-white border-b border-gray-200 px-6 py-3.5 flex items-center justify-between shadow-sm sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+          <h1 class="font-royal text-base sm:text-lg font-bold text-[#7b001c]">Nidhish Cloth Store ERP Suite</h1>
+          <span class="text-xs text-gray-400">|</span>
+          <span class="text-xs text-gray-500">Retail Billing & Accounting Management</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="openStoreQrModal()" class="btn-royal-gold px-3.5 py-1.5 rounded-full text-xs font-bold shadow flex items-center gap-1.5 border border-amber-500">
+            <span>📱</span> <span>Store QR & Standee (दुकान का QR)</span>
+          </button>
+          <button onclick="switchTab('pos')" class="btn-royal-maroon px-4 py-1.5 rounded-full text-xs font-semibold shadow flex items-center gap-1.5">
+            <span>⚡</span> <span>New Sale (POS)</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB SECTIONS -->
+      <div class="p-6 space-y-6">
+
+        <!-- ================= 1. TAB: DASHBOARD ================= -->
+        <section id="tabSection-dashboard" class="admin-tab-section space-y-6">
+          
+          <!-- KPI Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Total Sales -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Total Sales Billed</span>
+                <h3 id="metricTotalSales" class="text-xl font-bold text-[#7b001c] mt-0.5">₹0</h3>
+                <span id="metricTodaySales" class="text-[10px] text-emerald-600 font-medium">₹0 Today</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xl">💰</div>
+            </div>
+
+            <!-- Customer Outstanding Dues -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Customer Due (Receivable)</span>
+                <h3 id="metricCustomerOutstanding" class="text-xl font-bold text-red-600 mt-0.5">₹0</h3>
+                <span class="text-[10px] text-gray-400">Pending collections</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-red-50 text-red-700 flex items-center justify-center text-xl">📉</div>
+            </div>
+
+            <!-- Total Purchases -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Total Procurement</span>
+                <h3 id="metricTotalPurchases" class="text-xl font-bold text-gray-900 mt-0.5">₹0</h3>
+                <span class="text-[10px] text-gray-400">Supplier bills</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-xl">📥</div>
+            </div>
+
+            <!-- Supplier Payables -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Supplier Outstanding Due</span>
+                <h3 id="metricSupplierOutstanding" class="text-xl font-bold text-amber-700 mt-0.5">₹0</h3>
+                <span class="text-[10px] text-gray-400">Pending payables</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center text-xl">🧾</div>
+            </div>
+
+            <!-- Inventory Asset Valuation -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Inventory Cost Value</span>
+                <h3 id="metricStockValue" class="text-xl font-bold text-emerald-700 mt-0.5">₹0</h3>
+                <span id="metricStockUnits" class="text-[10px] text-gray-500 font-medium">0 Units in hand</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl">📦</div>
+            </div>
+
+            <!-- Low Stock Warnings -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Low Stock Alerts</span>
+                <h3 id="metricLowStockCount" class="text-xl font-bold text-orange-600 mt-0.5">0</h3>
+                <span class="text-[10px] text-red-500 font-medium">Reorder needed</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-700 flex items-center justify-center text-xl">⚠️</div>
+            </div>
+
+            <!-- Pending Orders -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-semibold text-gray-500 uppercase">Orders to Dispatch</span>
+                <h3 id="metricPendingOrders" class="text-xl font-bold text-[#7b001c] mt-0.5">0</h3>
+                <span class="text-[10px] text-gray-400">Pending delivery</span>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-xl">🚚</div>
+            </div>
+
+            <!-- Fast POS Terminal CTA -->
+            <div onclick="switchTab('pos')" class="bg-gradient-to-r from-[#7b001c] to-[#9c0024] text-white p-4 rounded-xl shadow-md flex items-center justify-between cursor-pointer hover:shadow-lg transition-all">
+              <div>
+                <span class="text-[11px] uppercase tracking-wider font-semibold text-amber-300">Quick Action</span>
+                <h3 class="text-base font-bold text-white mt-0.5">Open POS Billing →</h3>
+                <span class="text-[10px] text-gray-200">Start new customer counter sale</span>
+              </div>
+              <div class="text-2xl text-amber-300">⚡</div>
+            </div>
+
+          </div>
+
+          <!-- Visual Analytics & Recent Orders -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Monthly Sales Trend Chart -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Monthly Sales Performance</h4>
+              <div class="h-64">
+                <canvas id="monthlySalesChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Category Sales Share Chart -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Sales by Category</h4>
+              <div class="h-64 flex items-center justify-center">
+                <canvas id="categoryPieChart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Recent Orders Table -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider">Latest Sales & Store Orders</h4>
+              <button onclick="switchTab('pos')" class="text-xs font-semibold text-[#7b001c] hover:underline">+ New POS Bill</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Order / Bill #</th>
+                    <th class="py-2.5 px-3">Customer</th>
+                    <th class="py-2.5 px-3">Type</th>
+                    <th class="py-2.5 px-3">Grand Total</th>
+                    <th class="py-2.5 px-3">Status</th>
+                    <th class="py-2.5 px-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardRecentOrdersTable">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= 2. TAB: POS COUNTER BILLING ================= -->
+        <section id="tabSection-pos" class="admin-tab-section hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left: Product Picker -->
+            <div class="lg:col-span-1 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col h-[75vh]">
+              <h4 class="font-royal text-xs font-bold text-[#7b001c] uppercase tracking-wider mb-3">Product Catalog Selector</h4>
+              
+              <input 
+                type="text" 
+                id="posSearchInput" 
+                oninput="renderPosProductPicker(this.value)" 
+                placeholder="Search by product name, fabric, SKU..." 
+                class="w-full text-xs p-2.5 border border-gray-300 rounded mb-3 focus:outline-none focus:border-[#7b001c]"
+              >
+
+              <div id="posProductSearchResults" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                <!-- Products list -->
+              </div>
+            </div>
+
+            <!-- Right: POS Billing Cart & Calculation -->
+            <div class="lg:col-span-2 bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between h-[75vh]">
+              
+              <!-- Customer Selection Header -->
+              <div>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 pb-3 mb-2 border-b border-gray-200">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Select Customer</label>
+                    <select id="posCustomerSelect" onchange="handlePosCustomerSelectChange()" class="w-full text-xs p-1.5 border border-gray-300 rounded"></select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Customer Name (ग्राहक का नाम) *</label>
+                    <input type="text" id="posCustomerName" placeholder="e.g. Ramesh Singh" class="w-full text-xs p-1.5 border border-gray-300 rounded">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Mobile No. (मोबाइल नं.) *</label>
+                    <input type="tel" id="posCustomerPhone" placeholder="e.g. 9829012345" class="w-full text-xs p-1.5 border border-gray-300 rounded">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Full Address (पूरा पता) *</label>
+                    <input type="text" id="posCustomerAddress" placeholder="e.g. Jodhpur, Rajasthan" class="w-full text-xs p-1.5 border border-gray-300 rounded">
+                  </div>
+                </div>
+
+                <!-- Barcode & Item Code Auto-Scanner Bar -->
+                <div class="bg-amber-50/80 border border-amber-300 p-2.5 rounded-lg mb-3 flex items-center gap-2">
+                  <span class="text-base text-amber-800">🏷️</span>
+                  <div class="flex-1 flex items-center gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="text" 
+                        id="posBarcodeItemCodeInput" 
+                        onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handlePosBarcodeScan(); }" 
+                        placeholder="Item Code / Barcode (आइटम कोड या बारकोड डालकर Enter दबाएं)..." 
+                        class="w-full text-xs p-1.5 border border-amber-300 rounded bg-white font-mono focus:ring-2 focus:ring-[#7b001c] focus:outline-none"
+                      >
+                    </div>
+                    <button type="button" onclick="handlePosBarcodeScan()" class="btn-royal-maroon px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap shadow-sm">
+                      + Add Item (जोड़ें)
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Cart Table with User Specified Column Format -->
+                <div class="overflow-y-auto max-h-[35vh]">
+                  <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] font-bold text-gray-600 uppercase border-b border-gray-200">
+                      <tr>
+                        <th class="py-2 px-2 text-center w-12">Sr.No</th>
+                        <th class="py-2 px-2">Item Name</th>
+                        <th class="py-2 px-2 text-center w-32">Quantity ya Miters</th>
+                        <th class="py-2 px-2 text-center w-28">Price</th>
+                        <th class="py-2 px-2 text-right w-24">Total</th>
+                        <th class="py-2 px-2 text-center w-10"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="posCartTableBody">
+                      <!-- Rendered by admin.js -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- POS Totals & Payment Execution -->
+              <div class="border-t border-gray-200 pt-3 mt-3 bg-slate-50 p-4 rounded-lg">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-3">
+                  <div>
+                    <span class="text-gray-500 block">Subtotal:</span>
+                    <span id="posSubtotalDisplay" class="font-bold text-gray-900 text-sm">₹0</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 block">Tax (GST):</span>
+                    <span id="posTaxDisplay" class="font-semibold text-gray-800">₹0</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 block">Grand Total:</span>
+                    <span id="posGrandTotalDisplay" class="font-extrabold text-[#7b001c] text-base">₹0</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 block">Due Amount:</span>
+                    <span id="posDueDisplay" class="font-bold text-red-600 text-sm">₹0</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs items-end">
+                  <div>
+                    <label class="block text-gray-600 mb-1">Discount (₹)</label>
+                    <input type="number" id="posDiscountAmount" value="0" oninput="renderPosCart()" class="w-full border border-gray-300 rounded p-1.5 text-xs">
+                  </div>
+                  <div>
+                    <label class="block text-gray-600 mb-1">Payment Mode</label>
+                    <select id="posPaymentMethod" class="w-full border border-gray-300 rounded p-1.5 text-xs">
+                      <option value="CASH">Cash</option>
+                      <option value="UPI">UPI / QR Code</option>
+                      <option value="CARD">Credit / Debit Card</option>
+                      <option value="BANK_TRANSFER">Bank Transfer</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-600 mb-1">Amount Paid (₹)</label>
+                    <input type="number" id="posPaidAmount" oninput="renderPosCart()" class="w-full border border-gray-300 rounded p-1.5 text-xs font-bold text-emerald-800">
+                  </div>
+                  <div>
+                    <button onclick="handleCompletePosSale()" class="w-full btn-royal-gold py-2 rounded text-xs font-bold shadow-md">
+                      ✓ Save Sale & Print Bill
+                    </button>
+                  </div>
+                  <input type="hidden" id="posNotes" value="Counter Sale">
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= 3. TAB: PRODUCTS ================= -->
+        <section id="tabSection-products" class="admin-tab-section hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider">Product Inventory & Catalog</h3>
+            <button onclick="openAddProductModal()" class="btn-royal-maroon text-xs px-4 py-2 rounded font-semibold flex items-center gap-1.5">
+              <span>+ Add New Product</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Product Name & SKU</th>
+                    <th class="py-2.5 px-3">Category</th>
+                    <th class="py-2.5 px-3">Selling Price</th>
+                    <th class="py-2.5 px-3">Current Stock</th>
+                    <th class="py-2.5 px-3">Fabric</th>
+                    <th class="py-2.5 px-3">Status</th>
+                    <th class="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminProductsTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 4. TAB: PURCHASES ================= -->
+        <!-- ================= 4. TAB: PURCHASES ================= -->
+        <section id="tabSection-purchases" class="admin-tab-section hidden space-y-6">
+          
+          <!-- Inward Purchase Form -->
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+              <div>
+                <h4 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider flex items-center gap-2">
+                  <span>📥</span> <span>Supplier Inward Purchase Bill (सप्लायर खरीद बिल)</span>
+                </h4>
+                <p class="text-xs text-gray-500">नया स्टॉक जोड़ने, सप्लायर बिल दर्ज करने एवं खाता बही अपडेट करने के लिए फॉर्म भरें</p>
+              </div>
+              <div class="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded font-semibold">
+                Nidhish Cloth Store Procurement
+              </div>
+            </div>
+            
+            <!-- Supplier Information Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs mb-4 bg-slate-50 p-3.5 rounded-lg border border-gray-200">
+              <div class="sm:col-span-2 lg:col-span-1">
+                <label class="block text-gray-700 font-semibold mb-1">Select Supplier (सप्लायर चुनें)</label>
+                <select id="purchaseSupplierSelect" onchange="handlePurchaseSupplierSelectChange()" class="w-full border border-gray-300 rounded p-2 text-xs bg-white"></select>
+              </div>
+              <div>
+                <label class="block text-gray-700 font-semibold mb-1">Supplier Name (नाम) *</label>
+                <input type="text" id="purchaseSupplierName" placeholder="e.g. Mahaveer Textiles" class="w-full border border-gray-300 rounded p-2 text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-semibold mb-1">Mobile No. (मोबाइल नं.) *</label>
+                <input type="tel" id="purchaseSupplierPhone" placeholder="e.g. 9829012345" class="w-full border border-gray-300 rounded p-2 text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-semibold mb-1">Address (सप्लायर का पता)</label>
+                <input type="text" id="purchaseSupplierAddress" placeholder="e.g. Surat / Jodhpur" class="w-full border border-gray-300 rounded p-2 text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-semibold mb-1">Purchase Date (तारीख) *</label>
+                <input type="date" id="purchaseDate" class="w-full border border-gray-300 rounded p-2 text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-semibold mb-1">Bill Number (बिल नं.) *</label>
+                <input type="text" id="purchaseBillNumber" placeholder="e.g. SUP-2026-901" class="w-full border border-gray-300 rounded p-2 text-xs bg-white font-mono">
+              </div>
+            </div>
+
+            <!-- Product Selection Row with Quick Add Button -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs mb-4 items-end bg-amber-50/50 p-3 rounded-lg border border-amber-200">
+              <div class="sm:col-span-6">
+                <label class="block text-gray-700 font-semibold mb-1">Add Product to Bill (बिल में आइटम चुनें)</label>
+                <div class="flex gap-2">
+                  <select id="purchaseProductSelect" onchange="handlePurchaseProductSelectChange()" class="flex-1 border border-gray-300 rounded p-2 text-xs bg-white"></select>
+                  <button type="button" onclick="openAddProductModal()" title="Add New Product (साइड में नया आइटम जोड़ें)" class="btn-royal-maroon px-3 py-2 rounded text-xs font-semibold flex items-center gap-1 shadow whitespace-nowrap">
+                    <span>⚡ + Add Product</span>
+                  </button>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-gray-700 font-semibold mb-1">Quantity / Miters (मात्रा/मीटर)</label>
+                <input type="number" id="purchaseItemQty" step="any" value="10" placeholder="Qty" class="w-full border border-gray-300 rounded p-2 text-xs bg-white font-bold text-center">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-gray-700 font-semibold mb-1">Cost Rate (खरीद मूल्य ₹)</label>
+                <input type="number" id="purchaseItemCost" step="any" placeholder="Cost Rate ₹" class="w-full border border-gray-300 rounded p-2 text-xs bg-white text-center">
+              </div>
+              <div class="sm:col-span-2">
+                <button type="button" onclick="addPurchaseItemFromSelect()" class="w-full btn-royal-gold py-2 rounded text-xs font-bold shadow">
+                  + Add to Bill
+                </button>
+              </div>
+            </div>
+
+            <!-- Items Cart Table -->
+            <div class="overflow-x-auto mb-4 border border-gray-200 rounded">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-gray-50 text-gray-600 uppercase font-semibold text-[11px] border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3 text-center w-12">Sr.No</th>
+                    <th class="py-2.5 px-3">Item Name & SKU</th>
+                    <th class="py-2.5 px-3 text-center w-36">Quantity ya Miters</th>
+                    <th class="py-2.5 px-3 text-center w-32">Cost Price (₹)</th>
+                    <th class="py-2.5 px-3 text-right w-32">Total (₹)</th>
+                    <th class="py-2.5 px-3 text-center w-12"></th>
+                  </tr>
+                </thead>
+                <tbody id="purchaseCartTableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Footer & Save -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-gray-200 bg-slate-50 p-4 rounded-lg">
+              <div class="flex items-center gap-6 text-xs">
+                <div>
+                  <span class="text-gray-500 block text-[11px]">Total Items (कुल उत्पाद):</span>
+                  <span id="purchaseTotalItemsCount" class="font-bold text-gray-800 text-sm">0</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 block text-[11px]">Total Quantity / Meters (कुल मात्रा):</span>
+                  <span id="purchaseTotalQtyDisplay" class="font-extrabold text-emerald-700 text-base">0</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 block text-[11px]">Bill Total (कुल खरीद राशि):</span>
+                  <span id="purchaseTotalAmountDisplay" class="font-extrabold text-[#7b001c] text-base">₹0</span>
+                </div>
+              </div>
+              
+              <div class="flex flex-wrap items-center gap-3 text-xs">
+                <div>
+                  <label class="block text-[10px] text-gray-500">Discount (₹)</label>
+                  <input type="number" id="purchaseDiscount" value="0" oninput="renderPurchaseCart()" class="w-20 border border-gray-300 rounded p-1.5 text-xs">
+                </div>
+                <div>
+                  <label class="block text-[10px] text-gray-500">Amount Paid (₹)</label>
+                  <input type="number" id="purchasePaidAmount" oninput="updatePurchaseDueDisplay()" class="w-28 border border-gray-300 rounded p-1.5 text-xs font-bold text-emerald-800">
+                </div>
+                <div>
+                  <label class="block text-[10px] text-gray-500">Payment Mode</label>
+                  <select id="purchasePaymentMethod" class="border border-gray-300 rounded p-1.5 text-xs">
+                    <option value="CASH">Cash</option>
+                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                    <option value="UPI">UPI</option>
+                  </select>
+                </div>
+                <input type="hidden" id="purchaseNotes" value="Stock inward bill">
+                <button onclick="handleSavePurchase()" class="btn-royal-gold px-6 py-2.5 rounded text-xs font-bold shadow-md">
+                  ✓ Save Purchase & Add Stock
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Purchase History Table -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider">Past Supplier Purchase Bills (खरीद बिल इतिहास)</h4>
+              <span class="text-xs text-gray-400">All Inward Shipments</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Purchase #</th>
+                    <th class="py-2.5 px-3">Supplier Bill #</th>
+                    <th class="py-2.5 px-3">Supplier Name</th>
+                    <th class="py-2.5 px-3">Bill Date</th>
+                    <th class="py-2.5 px-3 text-center">Items & Qty</th>
+                    <th class="py-2.5 px-3">Bill Total</th>
+                    <th class="py-2.5 px-3">Paid Amount</th>
+                    <th class="py-2.5 px-3">Due Balance</th>
+                    <th class="py-2.5 px-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="purchasesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= 5. TAB: INVENTORY ================= -->
+        <section id="tabSection-inventory" class="admin-tab-section hidden space-y-6">
+          
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+            <div class="bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm">
+              <span class="text-gray-400 block">Total Active Items</span>
+              <b id="invTotalProducts" class="text-base text-gray-900">0</b>
+            </div>
+            <div class="bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm">
+              <span class="text-gray-400 block">Total Stock Units</span>
+              <b id="invTotalUnits" class="text-base text-gray-900">0</b>
+            </div>
+            <div class="bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm">
+              <span class="text-gray-400 block">Inventory Cost Value</span>
+              <b id="invCostValue" class="text-base text-emerald-700">₹0</b>
+            </div>
+            <div class="bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm">
+              <span class="text-gray-400 block">Inventory Retail Value</span>
+              <b id="invRetailValue" class="text-base text-[#7b001c]">₹0</b>
+            </div>
+            <div class="bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm">
+              <span class="text-gray-400 block">Low Stock Products</span>
+              <b id="invLowStock" class="text-base text-orange-600">0</b>
+            </div>
+          </div>
+
+          <!-- Category Sales Analytics Graph (सर्वाधिक बनाम न्यूनतम बिक्री तुलनात्मक ग्राफ) -->
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
+              <div>
+                <h4 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider flex items-center gap-2">
+                  <span>📊</span> <span>कैटेगरी बिक्री विश्लेषण ग्राफ (Category-Wise Sales Analytics)</span>
+                </h4>
+                <p class="text-xs text-gray-500">कौन सी श्रेणी का कपड़ा / पोशाक सबसे ज्यादा बिक रहा है और कौन सा सबसे कम (Real-time Volume & Demand)</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="loadInventoryCategorySalesChart()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 px-3 py-1.5 rounded font-semibold transition-colors flex items-center gap-1 shadow-sm">
+                  <span>🔄</span> <span>Refresh Analytics</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Performance Highlights (Top Selling vs Lowest Selling) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-lg flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl shadow-sm">🏆</div>
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">सर्वाधिक बिकने वाला (Highest Selling)</span>
+                  <div id="invTopCategoryName" class="font-bold text-emerald-950 text-sm mt-0.5">-</div>
+                  <span id="invTopCategoryStats" class="text-[11px] text-emerald-700">0 Units Sold</span>
+                </div>
+              </div>
+
+              <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-lg flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center text-xl shadow-sm">🔻</div>
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-rose-800 tracking-wider">सबसे कम बिकने वाला (Lowest Selling)</span>
+                  <div id="invLowestCategoryName" class="font-bold text-rose-950 text-sm mt-0.5">-</div>
+                  <span id="invLowestCategoryStats" class="text-[11px] text-rose-700">0 Units Sold</span>
+                </div>
+              </div>
+
+              <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-lg flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-xl shadow-sm">📦</div>
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-amber-800 tracking-wider">कुल बिक्री मात्रा (Total Units Sold)</span>
+                  <div id="invTotalUnitsSoldDisplay" class="font-bold text-amber-950 text-sm mt-0.5">0 Items / Meters</div>
+                  <span id="invTotalRevenueDisplay" class="text-[11px] text-amber-800">₹0 Total Revenue</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart Canvas -->
+            <div class="h-64 sm:h-72 w-full pt-1">
+              <canvas id="inventoryCategorySalesChart"></canvas>
+            </div>
+
+            <!-- Category Comparison Table -->
+            <div class="overflow-x-auto border border-gray-100 rounded-lg">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-600 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">कैटेगरी का नाम (Category)</th>
+                    <th class="py-2.5 px-3 text-center">बिक्री मात्रा (Units / Meters Sold)</th>
+                    <th class="py-2.5 px-3 text-right">कुल बिक्री मूल्य (Revenue ₹)</th>
+                    <th class="py-2.5 px-3 text-center">मौजूदा स्टॉक (In Stock)</th>
+                    <th class="py-2.5 px-3 text-center">डिमांड स्तर (Performance)</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryCategoryComparisonTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <div class="flex items-center justify-between">
+            <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider">Inventory Movement & Audit Trail</h4>
+            <button onclick="openStockAdjustmentModal()" class="btn-royal-maroon px-4 py-2 rounded text-xs font-semibold">
+              ± Manual Stock Adjustment
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Date</th>
+                    <th class="py-2.5 px-3">Product</th>
+                    <th class="py-2.5 px-3">Type</th>
+                    <th class="py-2.5 px-3">Qty</th>
+                    <th class="py-2.5 px-3">Stock Before → After</th>
+                    <th class="py-2.5 px-3">Audit Reference & Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryLogsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= 6. TAB: CUSTOMER CRM & LEDGER ================= -->
+        <section id="tabSection-customers" class="admin-tab-section hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+            <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider">Customer Directory & Outstanding Dues</h3>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Customer Name</th>
+                    <th class="py-2.5 px-3">Phone</th>
+                    <th class="py-2.5 px-3">City / State</th>
+                    <th class="py-2.5 px-3">Total Orders</th>
+                    <th class="py-2.5 px-3">Total Purchased</th>
+                    <th class="py-2.5 px-3">Due Balance</th>
+                    <th class="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 7. TAB: SUPPLIER DIRECTORY ================= -->
+        <section id="tabSection-suppliers" class="admin-tab-section hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+            <div>
+              <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider flex items-center gap-2">
+                <span>🏭</span> <span>Supplier Directory & Purchase Ledgers (सप्लायर विवरण एवं खाता बही)</span>
+              </h3>
+              <p class="text-xs text-gray-500">किस सप्लायर से कितना सामान लिया गया है और किसका कितना भुगतान बाकी है</p>
+            </div>
+            <button onclick="switchTab('purchases')" class="btn-royal-gold text-xs px-4 py-2 rounded font-bold shadow-sm flex items-center gap-1.5">
+              <span>+ Record New Purchase</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-600 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Supplier / Firm Name</th>
+                    <th class="py-2.5 px-3">Phone & Address</th>
+                    <th class="py-2.5 px-3 text-center">Total Items Taken (कुल सामान)</th>
+                    <th class="py-2.5 px-3 text-center">Total Bills (कुल बिल)</th>
+                    <th class="py-2.5 px-3">Total Purchases (कुल खरीद)</th>
+                    <th class="py-2.5 px-3">Total Paid (भुगतान)</th>
+                    <th class="py-2.5 px-3 text-red-600 font-bold">Remaining Due (बकाया पेमेंट)</th>
+                    <th class="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="suppliersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 8. TAB: PAYMENTS AUDIT ================= -->
+        <section id="tabSection-payments" class="admin-tab-section hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider">Financial Transactions Ledger</h3>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Date</th>
+                    <th class="py-2.5 px-3">Type</th>
+                    <th class="py-2.5 px-3">Party Name</th>
+                    <th class="py-2.5 px-3">Amount Paid</th>
+                    <th class="py-2.5 px-3">Method</th>
+                    <th class="py-2.5 px-3">Reference</th>
+                    <th class="py-2.5 px-3">Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="allPaymentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 9. TAB: FINANCIAL REPORTS ================= -->
+        <section id="tabSection-reports" class="admin-tab-section hidden space-y-6">
+          
+          <!-- Date Filter Header -->
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-xs">
+              <label class="text-gray-600 font-semibold">Start Date:</label>
+              <input type="date" id="reportStartDate" class="border border-gray-300 rounded p-1.5">
+              <label class="text-gray-600 font-semibold ml-2">End Date:</label>
+              <input type="date" id="reportEndDate" class="border border-gray-300 rounded p-1.5">
+              <button onclick="loadReportsView()" class="btn-royal-maroon px-4 py-1.5 rounded font-semibold ml-2">Filter</button>
+            </div>
+            <button onclick="exportSalesReportToCSV()" class="btn-royal-gold px-4 py-1.5 rounded text-xs font-bold">
+              📥 Export CSV
+            </button>
+          </div>
+
+          <!-- Profit and Loss Overview -->
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Estimated Profit & Loss Summary</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 text-xs">
+              <div class="p-3 bg-slate-50 rounded border border-gray-100">
+                <span class="text-gray-500 block">Sales Revenue</span>
+                <b id="plRevenue" class="text-base text-gray-900">₹0</b>
+              </div>
+              <div class="p-3 bg-slate-50 rounded border border-gray-100">
+                <span class="text-gray-500 block">Cost of Goods Sold</span>
+                <b id="plCogs" class="text-base text-gray-900">₹0</b>
+              </div>
+              <div class="p-3 bg-slate-50 rounded border border-gray-100">
+                <span class="text-gray-500 block">Gross Profit</span>
+                <b id="plGrossProfit" class="text-base text-blue-700">₹0</b>
+              </div>
+              <div class="p-3 bg-slate-50 rounded border border-gray-100">
+                <span class="text-gray-500 block">Discounts Given</span>
+                <b id="plDiscounts" class="text-base text-orange-600">₹0</b>
+              </div>
+              <div class="p-3 bg-slate-50 rounded border border-gray-100">
+                <span class="text-gray-500 block">Net Profit</span>
+                <b id="plNetProfit" class="text-base text-emerald-700">₹0</b>
+              </div>
+              <div class="p-3 bg-slate-50 rounded border border-gray-100">
+                <span class="text-gray-500 block">Profit Margin</span>
+                <b id="plMargin" class="text-base text-emerald-700">0%</b>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Sales Report Table -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider">Detailed Daily Sales Report</h4>
+              <div class="text-xs space-x-3 text-gray-600 font-semibold">
+                <span>Total Orders: <b id="reportTotalOrdersCount" class="text-gray-900">0</b></span>
+                <span>Total Sales: <b id="reportTotalSalesSum" class="text-[#7b001c]">₹0</b></span>
+                <span>Paid: <b id="reportTotalPaidSum" class="text-emerald-700">₹0</b></span>
+                <span>Due: <b id="reportTotalDueSum" class="text-red-600">₹0</b></span>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table id="salesReportTable" class="w-full text-left">
+                <thead class="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase border-b border-gray-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Date</th>
+                    <th class="py-2.5 px-3">Orders</th>
+                    <th class="py-2.5 px-3">Subtotal</th>
+                    <th class="py-2.5 px-3">Discounts</th>
+                    <th class="py-2.5 px-3">Tax</th>
+                    <th class="py-2.5 px-3">Grand Total</th>
+                    <th class="py-2.5 px-3">Paid Amount</th>
+                    <th class="py-2.5 px-3">Due Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="salesReportTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= 10. TAB: SETTINGS ================= -->
+        <section id="tabSection-settings" class="admin-tab-section hidden space-y-4">
+          <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-3xl">
+            <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider mb-4">Store Configuration & Tax Profile</h3>
+
+            <form onsubmit="handleSaveSettingsSubmit(event)" class="space-y-4 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">Store Name *</label>
+                  <input type="text" id="settStoreName" required class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">Store Tagline</label>
+                  <input type="text" id="settTagline" class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">Store Phone *</label>
+                  <input type="tel" id="settPhone" required class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">WhatsApp Business Number *</label>
+                  <input type="tel" id="settWhatsapp" required class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block font-semibold text-gray-700 mb-1">Store Address *</label>
+                  <input type="text" id="settAddress" required class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">GSTIN (Tax Identification) *</label>
+                  <input type="text" id="settGstin" required class="w-full border border-gray-300 rounded p-2 font-mono uppercase">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">Garment GST Rate (%) *</label>
+                  <input type="number" id="settTaxRate" required class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">Delivery Charge (₹)</label>
+                  <input type="number" id="settDeliveryFee" class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700 mb-1">Free Delivery Threshold (₹)</label>
+                  <input type="number" id="settFreeDelivery" class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block font-semibold text-gray-700 mb-1">UPI ID for Online QR</label>
+                  <input type="text" id="settUpiId" class="w-full border border-gray-300 rounded p-2 font-mono">
+                </div>
+                <input type="hidden" id="settEmail" value="goswamiashokpuri65@gmail.com">
+              </div>
+
+              <div class="pt-3 border-t border-gray-200">
+                <button type="submit" class="btn-royal-gold px-6 py-2.5 rounded font-bold text-xs uppercase tracking-wider shadow">
+                  Save Store Settings
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ================= ADMIN PROFILE SECTION ================= -->
+        <section id="tabSection-profile" class="admin-tab-section hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl">
+
+            <!-- Left 2 Cols: Personal & Contact Details -->
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- Personal Info Card -->
+              <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#7b001c] text-amber-200 flex items-center justify-center font-bold text-lg">
+                      👑
+                    </div>
+                    <div>
+                      <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider">Admin Profile & Personal Details</h3>
+                      <p class="text-[11px] text-gray-500">एडमिन का व्यक्तिगत विवरण व पासवर्ड रिकवरी संपर्क</p>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                    Super Administrator
+                  </span>
+                </div>
+
+                <form onsubmit="handleSaveAdminProfile(event)" class="space-y-4 text-xs">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block font-semibold text-gray-700 mb-1">Admin Full Name (एडमिन नाम) *</label>
+                      <input type="text" id="profAdminName" required placeholder="Ashok Puri" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon font-medium">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-gray-700 mb-1">Login Email Address *</label>
+                      <input type="email" id="profAdminEmail" required placeholder="goswamiashokpuri65@gmail.com" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon font-medium">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-gray-700 mb-1">Primary Mobile (Ashok Puri) *</label>
+                      <input type="tel" id="profAdminPhone" required placeholder="9672806509" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon font-medium">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-gray-700 mb-1">Alternate Mobile (Prem Puri)</label>
+                      <input type="tel" id="profAdminAltPhone" placeholder="9131974022" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon font-medium">
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="block font-semibold text-gray-700 mb-1">Store / Business Address</label>
+                      <input type="text" id="profAdminAddress" placeholder="Clock Tower Road" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-gray-700 mb-1">City</label>
+                      <input type="text" id="profAdminCity" placeholder="Jodhpur" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-gray-700 mb-1">State & Pincode</label>
+                      <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="profAdminState" placeholder="Rajasthan" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                        <input type="text" id="profAdminPincode" placeholder="342001" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <span class="text-[11px] text-gray-500">सभी बदलाव तुरंत डेटाबेस में सुरक्षित हो जाते हैं।</span>
+                    <button type="submit" id="btnSaveAdminProfile" class="btn-royal-gold px-6 py-2 rounded font-bold text-xs uppercase tracking-wider shadow">
+                      Save Profile Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Security & Password Change Card -->
+              <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center gap-3 pb-3 border-b border-gray-100 mb-4">
+                  <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-base">
+                    🔒
+                  </div>
+                  <div>
+                    <h3 class="font-royal text-sm font-bold text-[#7b001c] uppercase tracking-wider">Change Admin Password</h3>
+                    <p class="text-[11px] text-gray-500">एडमिन लॉगिन का पासवर्ड यहां से सुरक्षित रूप से बदलें</p>
+                  </div>
+                </div>
+
+                <form onsubmit="handleChangeAdminPassword(event)" class="space-y-3 text-xs max-w-md">
+                  <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Current Password (वर्तमान पासवर्ड) *</label>
+                    <input type="password" id="profCurrentPassword" required placeholder="••••••••" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-gray-700 mb-1">New Password (नया पासवर्ड) *</label>
+                    <input type="password" id="profNewPassword" required minlength="6" placeholder="न्यूनतम 6 अक्षर" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Confirm New Password *</label>
+                    <input type="password" id="profConfirmPassword" required minlength="6" placeholder="नया पासवर्ड दोबारा दर्ज करें" class="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-maroon">
+                  </div>
+
+                  <div class="pt-2">
+                    <button type="submit" id="btnChangePassword" class="btn-royal-maroon px-6 py-2 rounded font-bold text-xs uppercase tracking-wider shadow">
+                      Update Password
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+            </div>
+
+            <!-- Right 1 Col: Recovery & Account Status Card -->
+            <div class="space-y-6">
+              <div class="bg-gradient-to-br from-[#520013] to-[#7b001c] text-white p-6 rounded-xl shadow-lg border border-amber-400">
+                <div class="w-12 h-12 rounded-full bg-amber-400 text-maroon flex items-center justify-center text-2xl font-bold mb-3 shadow">
+                  👑
+                </div>
+                <h4 id="profSummaryName" class="font-royal text-base font-bold text-[#f3e5ab] mb-1">Ashok Puri</h4>
+                <p class="text-xs text-amber-200 mb-4">Master Store Administrator</p>
+
+                <div class="space-y-2 text-xs border-t border-amber-500/30 pt-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-300">Store Name:</span>
+                    <span class="font-semibold text-white">Nidhish Cloth Store</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-300">Role:</span>
+                    <span class="font-semibold text-amber-300">Owner & Admin</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-300">Status:</span>
+                    <span class="inline-flex items-center gap-1 text-emerald-300 font-semibold">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Active
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OTP Recovery Notice Box -->
+              <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 text-xs text-amber-950 space-y-2">
+                <div class="flex items-center gap-2 font-bold text-[#7b001c]">
+                  <span>📲</span> <span>Password Reset / OTP Recovery</span>
+                </div>
+                <p class="text-[11px] text-gray-600 leading-relaxed">
+                  यदि आप कभी एडमिन पासवर्ड भूल जाते हैं, तो लॉगिन स्क्रीन पर <b>"Forgot Password?"</b> विकल्प द्वारा यहां दर्ज ईमेल (<b id="profNoticeEmail">goswamiashokpuri65@gmail.com</b>) या मोबाइल नंबर (<b id="profNoticePhone">9672806509</b>) पर 6-अंकों का OTP प्राप्त कर आसानी से नया पासवर्ड बना सकते हैं।
+                </p>
+                <div class="pt-2 text-[11px] font-semibold text-gray-700">
+                  <span>Authorized Contacts:</span>
+                  <ul class="list-disc list-inside mt-1 space-y-0.5 text-gray-600">
+                    <li>Prem Puri: 9131974022</li>
+                    <li>Ashok Puri: 9672806509</li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ================= PRODUCT FORM MODAL ================= -->
+  <div id="productFormModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 my-8 max-h-[90vh] overflow-y-auto relative">
+      <button onclick="closeProductFormModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900">✕</button>
+      
+      <h3 id="productFormModalTitle" class="font-royal text-base font-bold text-[#7b001c] mb-4">Add Product</h3>
+
+      <form onsubmit="handleProductFormSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="editProductId">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-gray-700 mb-1">Product Title *</label>
+            <input type="text" id="prodName" required placeholder="e.g. Royal Maroon Pure Thakurji Poshak" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">SKU / Item Code *</label>
+            <input type="text" id="prodSku" required class="w-full border border-gray-300 rounded p-2 font-mono">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Category *</label>
+            <select id="prodCategory" required class="w-full border border-gray-300 rounded p-2">
+              <option value="1">Rajputi Bhari</option>
+              <option value="2">Rajputi Pure Poshak</option>
+              <option value="3">Rajputi Hafpure Poshak</option>
+              <option value="4">Rajputi Japan tora Poshak</option>
+              <option value="5">Cotton Suit</option>
+              <option value="6">Other Suit</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Selling Price (₹) *</label>
+            <input type="number" id="prodPrice" required class="w-full border border-gray-300 rounded p-2 font-bold text-[#7b001c]">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">MRP (₹) *</label>
+            <input type="number" id="prodMrp" required class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Purchase / Cost Price (₹) *</label>
+            <input type="number" id="prodCost" required class="w-full border border-gray-300 rounded p-2 text-emerald-800">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Stock Quantity *</label>
+            <input type="number" id="prodStock" required class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Low Stock Alert Threshold</label>
+            <input type="number" id="prodLowStock" value="3" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Fabric Type</label>
+            <input type="text" id="prodFabric" placeholder="Pure Thakurji / Chiffon / Silk" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Work Type</label>
+            <input type="text" id="prodWorkType" placeholder="Heavy Gota Patti / Zari / Danka" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Color</label>
+            <input type="text" id="prodColor" placeholder="Maroon & Gold" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-gray-700 mb-1">Available Sizes (comma separated)</label>
+            <input type="text" id="prodSizes" placeholder="S, M, L, XL, Free Size" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-gray-700 mb-1">Image URLs (comma separated)</label>
+            <input type="text" id="prodImages" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-gray-700 mb-1">Description</label>
+            <textarea id="prodDescription" rows="2" class="w-full border border-gray-300 rounded p-2"></textarea>
+          </div>
+          <div class="sm:col-span-2 flex items-center gap-4 pt-1">
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="prodIsFeatured"> <span>Featured Product</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="prodIsBestseller"> <span>Best Seller</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="prodIsActive" checked> <span>Active in Catalog</span></label>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-gray-200 flex justify-end gap-2">
+          <button type="button" onclick="closeProductFormModal()" class="px-4 py-2 border border-gray-300 rounded text-gray-600">Cancel</button>
+          <button type="submit" class="btn-royal-maroon px-6 py-2 rounded font-semibold">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= STOCK ADJUSTMENT MODAL ================= -->
+  <div id="stockAdjustmentModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+      <button onclick="closeStockAdjustmentModal()" class="absolute top-4 right-4 text-gray-400">✕</button>
+      <h3 class="font-royal text-sm font-bold text-[#7b001c] mb-3">Manual Stock Adjustment</h3>
+      
+      <form onsubmit="handleStockAdjustmentSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Select Product *</label>
+          <select id="adjProductSelect" required class="w-full border border-gray-300 rounded p-2"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Adjustment Type *</label>
+            <select id="adjType" class="w-full border border-gray-300 rounded p-2">
+              <option value="ADJUSTMENT_IN">+ Stock In (Add)</option>
+              <option value="ADJUSTMENT_OUT">- Stock Out (Remove)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Quantity *</label>
+            <input type="number" id="adjQuantity" required min="1" value="1" class="w-full border border-gray-300 rounded p-2">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Reason / Notes *</label>
+          <input type="text" id="adjNotes" required placeholder="e.g. Physical inventory recount / Damaged" class="w-full border border-gray-300 rounded p-2">
+        </div>
+        <button type="submit" class="w-full btn-royal-gold py-2 rounded font-bold mt-2">Submit Stock Adjustment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= PARTY LEDGER MODAL ================= -->
+  <div id="partyLedgerModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto relative my-8">
+      <button onclick="closePartyLedgerModal()" class="absolute top-4 right-4 text-gray-400">✕</button>
+      
+      <h3 id="ledgerModalTitle" class="font-royal text-base font-bold text-[#7b001c] mb-2">Ledger Account</h3>
+      <div id="ledgerPartyInfo" class="bg-amber-50 p-3 rounded border border-amber-200 text-xs mb-4"></div>
+
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">Invoices & Bills</h4>
+          <div class="overflow-x-auto border border-gray-200 rounded">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50 text-gray-500 font-semibold uppercase">
+                <tr>
+                  <th class="py-2 px-2">Bill #</th>
+                  <th class="py-2 px-2">Date</th>
+                  <th class="py-2 px-2">Total Amount</th>
+                  <th class="py-2 px-2">Paid</th>
+                  <th class="py-2 px-2">Due</th>
+                  <th class="py-2 px-2">Status</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerOrdersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-royal text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">Payment Receipts & Disbursements</h4>
+          <div class="overflow-x-auto border border-gray-200 rounded">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50 text-gray-500 font-semibold uppercase">
+                <tr>
+                  <th class="py-2 px-2">Date</th>
+                  <th class="py-2 px-2">Ref / Voucher</th>
+                  <th class="py-2 px-2">Amount (₹)</th>
+                  <th class="py-2 px-2">Method</th>
+                  <th class="py-2 px-2">Notes</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerPaymentsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RECORD PAYMENT VOUCHER MODAL ================= -->
+  <div id="recordPaymentModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+      <button onclick="closeRecordPaymentModal()" class="absolute top-4 right-4 text-gray-400">✕</button>
+      <h3 class="font-royal text-sm font-bold text-[#7b001c] mb-1">Record Payment Voucher</h3>
+      <div id="payPartyName" class="text-xs font-semibold text-gray-800"></div>
+      <div id="payCurrentDue" class="text-xs text-red-600 font-bold mb-3"></div>
+
+      <form onsubmit="handleRecordPaymentSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="payPartyType">
+        <input type="hidden" id="payPartyId">
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Payment Amount (₹) *</label>
+          <input type="number" id="payAmount" required class="w-full border border-gray-300 rounded p-2 font-bold text-emerald-800 text-sm">
+        </div>
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Payment Mode</label>
+          <select id="payMethod" class="w-full border border-gray-300 rounded p-2">
+            <option value="CASH">Cash</option>
+            <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+            <option value="BANK_TRANSFER">Direct Bank Transfer</option>
+            <option value="CARD">Card</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Voucher Notes</label>
+          <input type="text" id="payNotes" placeholder="e.g. Settled outstanding balance" class="w-full border border-gray-300 rounded p-2">
+        </div>
+        <button type="submit" class="w-full btn-royal-gold py-2.5 rounded font-bold text-xs uppercase tracking-wider shadow">
+          Confirm & Save Voucher
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= GST TAX INVOICE PRINTABLE MODAL ================= -->
+  <div id="invoiceModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-6 my-8 max-h-[95vh] overflow-y-auto relative">
+      
+      <!-- Top Actions Bar -->
+      <div class="no-print flex items-center justify-between pb-4 mb-4 border-b border-gray-200">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🧾</span>
+          <span class="font-royal text-sm font-bold text-[#7b001c]">GST Tax Sales Invoice</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <a id="invWhatsAppShareBtn" href="#" target="_blank" class="btn-whatsapp-order px-3 py-1.5 rounded text-xs flex items-center gap-1 font-semibold">
+            <span>WhatsApp Bill</span>
+          </a>
+          <button onclick="printCurrentInvoice()" class="btn-royal-gold px-4 py-1.5 rounded text-xs font-bold shadow">
+            🖨️ Print Invoice
+          </button>
+          <button onclick="closeInvoiceModal()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 rounded text-xs font-semibold">
+            Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Invoice Sheet Area -->
+      <div id="invoicePrintArea" class="bg-white border-2 border-amber-300 p-6 sm:p-8 rounded shadow-sm text-xs text-gray-800">
+        
+        <!-- Invoice Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 pb-6 border-b-2 border-amber-400">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">👑</span>
+              <h2 id="invStoreName" class="font-royal text-xl sm:text-2xl font-bold text-[#7b001c]">NIDHISH CLOTH STORE</h2>
+            </div>
+            <div id="invStoreAddress" class="text-gray-600 mt-1 max-w-sm">Clock Tower Road, Jodhpur, Rajasthan</div>
+            <div id="invStoreGstin" class="font-mono font-semibold text-gray-800 mt-0.5">GSTIN: 08AAACR1234R1ZP</div>
+            <div id="invStorePhone" class="text-gray-600">Prem Puri: 9131974022 | Ashok Puri: 9672806509</div>
+          </div>
+
+          <div class="text-right">
+            <span class="badge-gold text-xs font-bold uppercase tracking-wider px-3 py-1 inline-block mb-1">ORIGINAL TAX INVOICE</span>
+            <div class="font-mono font-bold text-[#7b001c] text-sm" id="invNumber">NCS-ORD-000000</div>
+            <div class="text-gray-500 mt-0.5">Date: <b id="invDate" class="text-gray-800">2026-09-23</b></div>
+            <div class="text-[11px] text-gray-500" id="invSaleType">Counter Sale</div>
+          </div>
+        </div>
+
+        <!-- Bill To Details -->
+        <div class="grid grid-cols-2 gap-4 py-4 border-b border-gray-200">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-amber-800 tracking-wider block mb-1">BILLED TO (CUSTOMER):</span>
+            <div id="invCustName" class="font-bold text-gray-900 text-sm">Customer Name</div>
+            <div id="invCustPhone" class="text-gray-600">Phone: 9800000000</div>
+            <div id="invCustAddress" class="text-gray-500">Customer Address</div>
+          </div>
+
+          <div class="text-right">
+            <span class="text-[10px] uppercase font-bold text-amber-800 tracking-wider block mb-1">STATE OF SUPPLY:</span>
+            <div class="font-bold text-gray-800">08 - Rajasthan</div>
+            <div class="text-[11px] text-gray-500 mt-1">Payment Method: <b id="invPaymentMethod" class="text-gray-800">CASH</b></div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="py-4">
+          <table class="w-full text-left">
+            <thead class="bg-[#f8f3e6] border-y border-amber-300 text-[10px] font-bold text-gray-700 uppercase">
+              <tr>
+                <th class="py-2 px-2 text-center w-12">Sr.No</th>
+                <th class="py-2 px-2">Item Name</th>
+                <th class="py-2 px-2 text-center w-32">Quantity ya Miters</th>
+                <th class="py-2 px-2 text-right w-28">Price</th>
+                <th class="py-2 px-2 text-right w-32">Total</th>
+              </tr>
+            </thead>
+            <tbody id="invItemsTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Totals & Payment Summary -->
+        <div class="grid grid-cols-2 gap-6 pt-4 border-t-2 border-amber-300">
+          
+          <div class="space-y-2">
+            <div class="p-3 bg-amber-50/50 rounded border border-amber-200 flex items-center gap-3">
+              <img id="invUpiQr" src="" alt="QR" class="w-16 h-16 rounded border border-amber-300">
+              <div class="text-[10px] text-gray-600">
+                <span class="font-bold text-[#7b001c] block">Instant UPI Payment</span>
+                Scan with GPay/PhonePe to pay invoice balance directly.
+              </div>
+            </div>
+            <div class="text-[10px] text-gray-500 italic">
+              Terms: Traditional handloom garments. Hand-crafted poshaaks require delicate dry clean only.
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-right">
+            <div class="flex justify-between text-gray-600">
+              <span>Subtotal:</span>
+              <span id="invSubtotal" class="font-semibold text-gray-900">₹0</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+              <span>Discount:</span>
+              <span id="invDiscount">₹0</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+              <span>GST Tax:</span>
+              <span id="invTax">₹0</span>
+            </div>
+            <div class="flex justify-between text-sm font-bold text-[#7b001c] pt-2 border-t border-gray-200">
+              <span>Grand Total:</span>
+              <span id="invGrandTotal">₹0</span>
+            </div>
+            <div class="flex justify-between text-emerald-700 font-semibold">
+              <span>Paid Amount:</span>
+              <span id="invPaidAmount">₹0</span>
+            </div>
+            <div class="flex justify-between text-red-600 font-bold">
+              <span>Due Balance:</span>
+              <span id="invDueAmount">₹0</span>
+            </div>
+
+            <!-- Signature block -->
+            <div class="pt-8 text-center sm:text-right">
+              <div class="inline-block border-t border-gray-400 pt-1 text-[11px] font-semibold text-gray-700">
+                For NIDHISH CLOTH STORE<br>
+                <span class="text-[9px] text-gray-400">Authorized Signatory</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= ADMIN TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="adminToastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/storeQr.js"></script>
+</body>
+</html>

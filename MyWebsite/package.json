@@ -1,0 +1,24 @@
+{
+  "name": "nidhish-cloth-store",
+  "version": "1.0.0",
+  "description": "Nidhish Cloth Store - Royal Rajasthani E-Commerce & Retail Business ERP System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "rajputi",
+    "nidhish-cloth-store",
+    "pos",
+    "ecommerce",
+    "inventory-management",
+    "rajasthani-poshak",
+    "retail-erp"
+  ],
+  "author": "Nidhish Cloth Store (Ashok Puri & Prem Puri)",
+  "license": "ISC"
+}
